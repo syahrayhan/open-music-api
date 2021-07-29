@@ -23,13 +23,13 @@ class OpenMusicHandler {
         genre,
         duration,
       }
-      const musicId = await this._service.addMusic(data)
+      const songId = await this._service.addMusic(data)
 
       return h.response({
         status: 'success',
         message: 'Lagu berhasil ditambahkan',
         data: {
-          musicId,
+          songId,
         },
       }).code(201)
     } catch (error) {
@@ -49,13 +49,11 @@ class OpenMusicHandler {
   }
 
   async getAllMusicHandler () {
-    const songs = this._service.getAllMusic()
+    const songs = await this._service.getAllMusic()
     return {
       status: 'success',
       data: {
-        songs: {
-          songs,
-        },
+        songs,
       },
     }
   }
@@ -63,13 +61,11 @@ class OpenMusicHandler {
   async getDetailMusicByIdHandler (request, h) {
     try {
       const { id } = request.params
-      const music = await this._service.getDetailMusicById(id)
+      const song = await this._service.getDetailMusicById(id)
       return {
         status: 'success',
         data: {
-          song: {
-            music,
-          },
+          song,
         },
       }
     } catch (error) {
@@ -77,7 +73,7 @@ class OpenMusicHandler {
         return h.response({
           status: 'fail',
           message: error.message,
-        }).code(error.code)
+        }).code(error.statusCode)
       }
 
       console.log(error)
@@ -113,7 +109,7 @@ class OpenMusicHandler {
         return h.response({
           status: 'fail',
           message: error.message,
-        }).code(error.code)
+        }).code(error.statusCode)
       }
 
       console.log(error)
@@ -138,7 +134,7 @@ class OpenMusicHandler {
         return h.response({
           status: 'fail',
           message: error.message,
-        }).code(error.code)
+        }).code(error.statusCode)
       }
 
       console.log(error)

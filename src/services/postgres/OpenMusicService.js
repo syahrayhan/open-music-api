@@ -2,7 +2,7 @@ const { nanoid } = require('nanoid')
 const { Pool } = require('pg')
 const InvariantError = require('../../exceptions/InvariantError')
 const NotFoundError = require('../../exceptions/NotFoundError')
-const { mapDbToModel } = require('../../utils/MusicUtils')
+const { mapDbToModelAllMusic, mapDbToModelDetailMusic } = require('../../utils/MusicUtils')
 
 class OpenMusicService {
   constructor () {
@@ -10,7 +10,7 @@ class OpenMusicService {
   }
 
   async addMusic (data) {
-    const id = nanoid(13)
+    const id = nanoid(16)
     const insertedAt = new Date().toISOString()
     const updatedAt = insertedAt
 
@@ -37,11 +37,10 @@ class OpenMusicService {
   }
 
   async getAllMusic () {
-    const query = await this._pool.query(
+    const result = await this._pool.query(
       'SELECT id, title, performer FROM music'
     )
-
-    return query.rows.map(mapDbToModel)
+    return result.rows.map(mapDbToModelAllMusic)
   }
 
   async getDetailMusicById (id) {
@@ -52,11 +51,11 @@ class OpenMusicService {
 
     const result = await this._pool.query(query)
 
-    if (!result.rowCount) {
+    if (!result.rows.length) {
       throw new NotFoundError('Music tidak ditemukan')
     }
 
-    return result.rows.map(mapDbToModel)[0]
+    return result.rows.map(mapDbToModelDetailMusic)[0]
   }
 
   async editMusicById (data) {
