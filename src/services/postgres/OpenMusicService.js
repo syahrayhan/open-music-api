@@ -1,5 +1,7 @@
 const { nanoid } = require('nanoid')
 const { Pool } = require('pg')
+const InvariantError = require('../../exceptions/InvariantError')
+const NotFoundError = require('../../exceptions/NotFoundError')
 const { mapDbToModel } = require('../../utils/MusicUtils')
 
 class OpenMusicService {
@@ -28,7 +30,7 @@ class OpenMusicService {
 
     const result = await this._pool.query(query)
     if (!result.rows[0].id) {
-      console.log('Gagal menambahkan Music')
+      throw new InvariantError('Gagal menambahkan Music')
     }
 
     return result.rows[0].id
@@ -39,7 +41,7 @@ class OpenMusicService {
       'SELECT id, title, performer FROM music'
     )
 
-    return query.rows
+    return query.rows.map(mapDbToModel)
   }
 
   async getDetailMusicById (id) {
@@ -51,7 +53,7 @@ class OpenMusicService {
     const result = await this._pool.query(query)
 
     if (!result.rowCount) {
-      console.log('Gagal menampilkan detail music')
+      throw new NotFoundError('Music tidak ditemukan')
     }
 
     return result.rows.map(mapDbToModel)[0]
@@ -76,7 +78,7 @@ class OpenMusicService {
     const result = await this._pool.query(query)
 
     if (!result.rows.length) {
-      console.log('Gagal Memperbaharui music')
+      throw new NotFoundError('Gagal Memperbaharui music, id tidak ditemukan')
     }
   }
 
@@ -89,7 +91,7 @@ class OpenMusicService {
     const result = await this._pool.query(query)
 
     if (!result.rows.length) {
-      console.log('Gagal Menghapus music')
+      throw new NotFoundError('Gagal Menghapus music, id tidak ditemukan')
     }
   }
 }
