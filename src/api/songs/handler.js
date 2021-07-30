@@ -48,7 +48,7 @@ class OpenMusicHandler {
     }
   }
 
-  async getAllMusicHandler (h) {
+  async getAllMusicHandler (request, h) {
     try {
       const songs = await this._service.getAllMusic()
       return h.response({
