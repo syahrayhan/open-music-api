@@ -24,16 +24,20 @@ const init = async () => {
     // get response context from request
     const { response } = request
 
-    if (response instanceof ClientError) {
-      // membuat response baru dari response toolkit sesuai kebutuhan error handling
-      const newResponse = h.response({
+    if (response instanceof Error) {
+      if (response instanceof ClientError) {
+        // membuat response baru dari response toolkit sesuai kebutuhan error handling
+        return h.response({
+          status: 'fail',
+          message: response.message,
+        }).code(response.statusCode)
+      }
+
+      return h.response({
         status: 'fail',
-        message: response.message,
-      })
-
-      newResponse.code(response.stat)
+        message: 'Sorry, there was a failure on our server',
+      }).code(500)
     }
-
     // jika bukan ClientError, lanjutkan dengan response sebelumnya (tanpa terintervensi)
 
     return response.continue || response
