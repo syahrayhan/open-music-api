@@ -48,13 +48,28 @@ class OpenMusicHandler {
     }
   }
 
-  async getAllMusicHandler () {
-    const songs = await this._service.getAllMusic()
-    return {
-      status: 'success',
-      data: {
-        songs,
-      },
+  async getAllMusicHandler (h) {
+    try {
+      const songs = await this._service.getAllMusic()
+      return h.response({
+        status: 'success',
+        data: {
+          songs,
+        },
+      })
+    } catch (error) {
+      if (error instanceof ClientError) {
+        return h.response({
+          status: 'fail',
+          message: error.message,
+        }).code(error.statusCode)
+      }
+
+      console.log(error)
+      return h.response({
+        status: 'error',
+        message: 'Maaf, Terjadi kegagalan pada server kami',
+      }).code(500)
     }
   }
 
