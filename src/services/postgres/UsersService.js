@@ -8,8 +8,8 @@ class UsersService {
     this._pool = new Pool()
   }
 
-  async addUsers ({ username, password, fullname }) {
-    this.verifyNewUser(username)
+  async addUser ({ username, password, fullname }) {
+    await this.verifyNewUser(username)
     const id = `user-${nanoid(16)}`
     const hashedPassword = await bcrypt.hash(password, 10)
 
