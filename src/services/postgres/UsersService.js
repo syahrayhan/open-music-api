@@ -39,6 +39,28 @@ class UsersService {
       throw new InvariantError('Failed to add user. Username already used')
     }
   }
+
+  async verifyUserCredential (username, password) {
+    const query = {
+      text: 'SELECT id, password FROM users WHERE username = $1',
+      values: [username],
+    }
+
+    const result = await this._pool.query(query)
+
+    if (!result.rowCount) {
+      throw new InvariantError('The credentials you provided are wrong')
+    }
+
+    const { id, password: hashedPassword } = result.rows[0]
+    const match = await bcrypt.compare(password, hashedPassword)
+
+    if (!match) {
+      throw new InvariantError('The credentials you provided are wrong')
+    }
+
+    return id
+  }
 }
 
 module.exports = UsersService
