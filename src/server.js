@@ -2,12 +2,16 @@
 require('dotenv').config()
 
 const Hapi = require('@hapi/hapi')
-const songs = require('./api/songs')
-const users = require('./api/users')
+const Jwt = require('@hapi/jwt')
+
 const ClientError = require('./exceptions/ClientError')
+
+const songs = require('./api/songs')
 const OpenMusicService = require('./services/postgres/OpenMusicService')
-const UsersService = require('./services/postgres/UsersService')
 const openMusicValidator = require('./validator/songs')
+
+const users = require('./api/users')
+const UsersService = require('./services/postgres/UsersService')
 const UsersValidator = require('./validator/users')
 
 const init = async () => {
@@ -51,6 +55,31 @@ const init = async () => {
     return response.continue || response
   })
 
+  // exsternal plugin
+  await server.register([
+    {
+      plugin: Jwt,
+    }
+  ])
+
+  // Jwt authentications Strategy
+  server.auth.strategy('openmusic_jwt', 'jwt', {
+    keys: process.env.ACCESS_TOKEN_KEY,
+    verify: {
+      aud: false,
+      iss: false,
+      sub: false,
+      maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+    },
+    validate: (artifacts) => ({
+      isValid: true,
+      credentials: {
+        id: artifacts.decoded.payload.id,
+      },
+    }),
+  })
+
+  // internal plugin
   await server.register([
     {
       plugin: songs,
