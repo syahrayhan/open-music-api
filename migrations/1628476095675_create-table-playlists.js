@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 exports.up = pgm => {
-  pgm.addTable('playlists', {
+  pgm.createTable('playlists', {
     id: {
       type: 'VARCHAR(50)',
       primaryKey: true,
