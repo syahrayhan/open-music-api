@@ -31,7 +31,7 @@ class OpenMusicHandler {
     }).code(201)
   }
 
-  async getAllMusicHandler () {
+  async getAllMusicHandler (request) {
     const songs = await this._service.getAllMusic()
     return {
       status: 'success',

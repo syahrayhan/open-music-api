@@ -4,8 +4,6 @@ require('dotenv').config()
 const Hapi = require('@hapi/hapi')
 const Jwt = require('@hapi/jwt')
 
-const ClientError = require('./exceptions/ClientError')
-
 const songs = require('./api/songs')
 const OpenMusicService = require('./services/postgres/OpenMusicService')
 const openMusicValidator = require('./validator/songs')
@@ -15,14 +13,16 @@ const UsersService = require('./services/postgres/UsersService')
 const UsersValidator = require('./validator/users')
 
 const authentications = require('./api/authentications')
-const AuthenticationsHandler = require('./api/authentications/handler')
 const AuthenticationsValidator = require('./validator/authentications')
 const TokenManager = require('./tokennize/tokenManager')
+const AuthenticationsSerive = require('./services/postgres/AuthenticationsService')
+
+const ClientError = require('./exceptions/ClientError')
 
 const init = async () => {
   const openMusicService = new OpenMusicService()
   const usersService = new UsersService()
-  const authenticationsService = new AuthenticationsHandler()
+  const authenticationsService = new AuthenticationsSerive()
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -40,7 +40,6 @@ const init = async () => {
 
     if (response instanceof Error) {
       if (response instanceof ClientError) {
-        // membuat response baru dari response toolkit sesuai kebutuhan error handling
         return h
           .response({
             status: 'fail',
@@ -48,7 +47,6 @@ const init = async () => {
           })
           .code(response.statusCode)
       }
-
       return h
         .response({
           status: 'fail',
