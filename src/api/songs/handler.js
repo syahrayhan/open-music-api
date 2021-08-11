@@ -31,7 +31,7 @@ class OpenMusicHandler {
     }).code(201)
   }
 
-  async getAllMusicHandler (request) {
+  async getAllMusicHandler () {
     const songs = await this._service.getAllMusic()
     return {
       status: 'success',
@@ -52,7 +52,7 @@ class OpenMusicHandler {
     }
   }
 
-  async putMusicByIdHandler (request, h) {
+  async putMusicByIdHandler (request) {
     this._validator.validateMusicPayload(request.payload)
     const { title, year, performer, genre, duration } = request.payload
     const { id } = request.params

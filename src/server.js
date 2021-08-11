@@ -17,12 +17,17 @@ const AuthenticationsValidator = require('./validator/authentications')
 const TokenManager = require('./tokennize/tokenManager')
 const AuthenticationsSerive = require('./services/postgres/AuthenticationsService')
 
+const playlists = require('./api/playlists')
+const PlaylistsValidator = require('./validator/playlists')
+const PlaylistsService = require('./services/postgres/PlaylistsService')
+
 const ClientError = require('./exceptions/ClientError')
 
 const init = async () => {
   const openMusicService = new OpenMusicService()
   const usersService = new UsersService()
   const authenticationsService = new AuthenticationsSerive()
+  const playlistsService = new PlaylistsService()
 
   const server = Hapi.server({
     port: process.env.PORT,
@@ -38,6 +43,7 @@ const init = async () => {
     // get response context from request
     const { response } = request
 
+    console.log('server error : ' + response)
     if (response instanceof Error) {
       if (response instanceof ClientError) {
         return h
@@ -46,6 +52,14 @@ const init = async () => {
             message: response.message,
           })
           .code(response.statusCode)
+      }
+      if (response.message === 'Missing authentication') {
+        return h
+          .response({
+            status: 'fail',
+            message: response.message,
+          })
+          .code(401)
       }
       return h
         .response({
@@ -106,6 +120,13 @@ const init = async () => {
         usersService,
         tokenManager: TokenManager,
         validator: AuthenticationsValidator,
+      },
+    },
+    {
+      plugin: playlists,
+      options: {
+        service: playlistsService,
+        validator: PlaylistsValidator,
       },
     }
   ])
