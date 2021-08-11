@@ -102,10 +102,6 @@ class OpenMusicService {
 
     const result = await this._pool.query(query)
 
-    // if (result.rows[0].id !== id) {
-    //   throw new InvariantError('invalid id')
-    // }
-
     if (!result.rowCount) {
       throw new NotFoundError('Song is not found')
     }
