@@ -93,6 +93,23 @@ class OpenMusicService {
       throw new NotFoundError('Gagal Menghapus music, id tidak ditemukan')
     }
   }
+
+  async verifySongIsFound (id) {
+    const query = {
+      text: 'SELECT id FROM music WHERE id = $1',
+      values: [id],
+    }
+
+    const result = await this._pool.query(query)
+
+    // if (result.rows[0].id !== id) {
+    //   throw new InvariantError('invalid id')
+    // }
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Song is not found')
+    }
+  }
 }
 
 module.exports = OpenMusicService

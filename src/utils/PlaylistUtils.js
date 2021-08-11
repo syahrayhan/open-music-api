@@ -4,4 +4,10 @@ const mapDBtoModelPlaylists = (data) => ({
   username: data.username,
 })
 
-module.exports = { mapDBtoModelPlaylists }
+const mapDBtoModelPlaylistSongs = (data) => ({
+  id: data.song_id,
+  title: data.title,
+  performer: data.performer,
+})
+
+module.exports = { mapDBtoModelPlaylists, mapDBtoModelPlaylistSongs }
