@@ -51,8 +51,7 @@ class PlaylistsService {
             FROM playlists 
             LEFT JOIN users ON users.id = playlists.owner
             LEFT JOIN collaborations ON collaborations.playlist_id = playlists.id 
-            WHERE playlists.owner = $1 OR collaborations.user_id = $1
-            GROUP BY 1,2,3`,
+            WHERE playlists.owner = $1 OR collaborations.user_id = $1`,
       values: [owner],
     }
 

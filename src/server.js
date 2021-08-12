@@ -48,7 +48,6 @@ const init = async () => {
     // get response context from request
     const { response } = request
 
-    console.log('server error : ' + response)
     if (response instanceof Error) {
       if (response instanceof ClientError) {
         return h
