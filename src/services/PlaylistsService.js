@@ -4,7 +4,6 @@ const AuthorizationError = require('../exceptions/AuthorizationError')
 const InvariantError = require('../exceptions/InvariantError')
 const NotFoundError = require('../exceptions/NotFoundError')
 const {
-  mapDBtoModelPlaylists,
   mapDBtoModelPlaylistSongs,
 } = require('../utils/PlaylistUtils')
 
@@ -57,13 +56,7 @@ class PlaylistsService {
 
     const result = await this._pool.query(query)
 
-    if (!result.rowCount) {
-      throw new NotFoundError(
-        "you don't have a playlist, please try to add playlist"
-      )
-    }
-
-    return result.rows.map(mapDBtoModelPlaylists)
+    return result.rows
   }
 
   async deletePlaylist (id) {
