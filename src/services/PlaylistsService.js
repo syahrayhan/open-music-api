@@ -3,9 +3,7 @@ const { Pool } = require('pg')
 const AuthorizationError = require('../exceptions/AuthorizationError')
 const InvariantError = require('../exceptions/InvariantError')
 const NotFoundError = require('../exceptions/NotFoundError')
-const {
-  mapDBtoModelPlaylistSongs,
-} = require('../utils/PlaylistUtils')
+const { mapDBtoModelPlaylistSongs } = require('../utils/PlaylistUtils')
 
 class PlaylistsService {
   constructor (openMusicService, collaborationService) {
@@ -15,7 +13,7 @@ class PlaylistsService {
   }
 
   async addPlaylist ({ name, owner }) {
-    this.verifyPlaylistName(name)
+    await this.verifyPlaylistName(name, owner)
     const id = `playlist-${nanoid(16)}`
     const query = {
       text: 'INSERT INTO playlists VALUES($1, $2, $3) RETURNING id',
@@ -31,10 +29,10 @@ class PlaylistsService {
     return result.rows[0].id
   }
 
-  async verifyPlaylistName (name) {
+  async verifyPlaylistName (name, owner) {
     const query = {
-      text: 'SELECT name FROM playlists WHERE playlists = $1',
-      values: [name],
+      text: 'SELECT * FROM playlists WHERE name = $1 and owner = $2',
+      values: [name, owner],
     }
 
     const result = await this._pool.query(query)
@@ -50,7 +48,8 @@ class PlaylistsService {
             FROM playlists 
             LEFT JOIN users ON users.id = playlists.owner
             LEFT JOIN collaborations ON collaborations.playlist_id = playlists.id 
-            WHERE playlists.owner = $1 OR collaborations.user_id = $1`,
+            WHERE playlists.owner = $1 OR collaborations.user_id = $1
+            GROUP BY 1,2,3`,
       values: [owner],
     }
 
@@ -73,8 +72,6 @@ class PlaylistsService {
   }
 
   async verifyPlaylistOwner (id, owner) {
-    console.log('verify id playlist owner : ' + id)
-    console.log('owner : ' + owner)
     const query = {
       text: `SELECT * FROM playlists 
              WHERE playlists.id = $1`,
@@ -88,7 +85,6 @@ class PlaylistsService {
     }
 
     const music = result.rows[0]
-    console.log(music)
 
     if (music.owner !== owner) {
       throw new AuthorizationError(
@@ -138,7 +134,6 @@ class PlaylistsService {
     }
 
     const result = await this._pool.query(query)
-    console.log(result.rows)
 
     if (!result.rowCount) {
       throw new InvariantError(

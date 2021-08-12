@@ -72,7 +72,6 @@ const init = async () => {
         })
         .code(500)
     }
-    // jika bukan ClientError, lanjutkan dengan response sebelumnya (tanpa terintervensi)
 
     return response.continue || response
   })

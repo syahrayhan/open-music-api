@@ -11,11 +11,9 @@ class AuthenticationsHandler {
   }
 
   async postAuthenticationHandler (request, h) {
-    console.log(request.payload)
     this._validator.validatePostAuthenticationPayload(request.payload)
 
     const { username, password } = request.payload
-    console.log('user ' + username)
     const id = await this._usersService.verifyUserCredential(username, password)
     const accessToken = this._tokenManager.generateAccessToken({ id })
     const refreshToken = this._tokenManager.generateRefreshToken({ id })
