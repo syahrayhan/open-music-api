@@ -5,25 +5,25 @@ const Hapi = require('@hapi/hapi')
 const Jwt = require('@hapi/jwt')
 
 const songs = require('./api/songs')
-const OpenMusicService = require('./services/OpenMusicService')
+const OpenMusicService = require('./services/postgres/OpenMusicService')
 const openMusicValidator = require('./validator/songs')
 
 const users = require('./api/users')
-const UsersService = require('./services/UsersService')
+const UsersService = require('./services/postgres/UsersService')
 const UsersValidator = require('./validator/users')
 
 const authentications = require('./api/authentications')
 const AuthenticationsValidator = require('./validator/authentications')
 const TokenManager = require('./tokennize/tokenManager')
-const AuthenticationsSerive = require('./services/AuthenticationsService')
+const AuthenticationsSerive = require('./services/postgres/AuthenticationsService')
 
 const playlists = require('./api/playlists')
 const PlaylistsValidator = require('./validator/playlists')
-const PlaylistsService = require('./services/PlaylistsService')
+const PlaylistsService = require('./services/postgres/PlaylistsService')
 
 const collaborations = require('./api/collaborations')
 const CollaborationsValidator = require('./validator/collaborations')
-const CollaborationsService = require('./services/CollaborationsService')
+const CollaborationsService = require('./services/postgres/CollaborationsService')
 
 const ClientError = require('./exceptions/ClientError')
 
