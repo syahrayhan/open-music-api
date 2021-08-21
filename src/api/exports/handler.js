@@ -5,6 +5,7 @@ class ExportsHandler {
   }
 
   async postExportMusicHandler (request, h) {
+    this._validator.validateExportMusicPayload(request.payload)
   }
 }
 
