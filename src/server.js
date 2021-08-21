@@ -3,6 +3,7 @@ require('dotenv').config()
 
 const Hapi = require('@hapi/hapi')
 const Jwt = require('@hapi/jwt')
+const Inert = require('@hapi/inert')
 
 const songs = require('./api/songs')
 const OpenMusicService = require('./services/postgres/OpenMusicService')
@@ -24,6 +25,10 @@ const PlaylistsService = require('./services/postgres/PlaylistsService')
 const collaborations = require('./api/collaborations')
 const CollaborationsValidator = require('./validator/collaborations')
 const CollaborationsService = require('./services/postgres/CollaborationsService')
+
+const _exports = require('./api/exports')
+const ProducerService = require('./services/rabbitmq/ProducerService')
+const ExportsValidator = require('./validator/exports')
 
 const ClientError = require('./exceptions/ClientError')
 
@@ -80,6 +85,9 @@ const init = async () => {
   await server.register([
     {
       plugin: Jwt,
+    },
+    {
+      plugin: Inert,
     }
   ])
 
@@ -138,6 +146,14 @@ const init = async () => {
         collaborationsService,
         playlistsService,
         validator: CollaborationsValidator,
+      },
+    },
+    {
+      plugin: _exports,
+      options: {
+        playlistsService,
+        service: ProducerService,
+        validator: ExportsValidator,
       },
     }
   ])
