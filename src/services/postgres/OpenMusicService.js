@@ -32,7 +32,6 @@ class OpenMusicService {
     if (!result.rows[0].id) {
       throw new InvariantError('Gagal menambahkan Music')
     }
-
     return result.rows[0].id
   }
 
