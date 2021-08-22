@@ -8,7 +8,6 @@ class UploadsHandler {
 
   async postUploadPictureHandler (request, h) {
     const { data } = request.payload
-    console.log(data.hapi)
     this._validator.validateImageHeaders(data.hapi.headers)
 
     const filename = await this._service.writeFile(data, data.hapi)

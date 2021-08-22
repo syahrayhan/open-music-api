@@ -11,7 +11,6 @@ class ExportsHandler {
     this._validator.validateExportMusicPayload(request.payload)
     const { playlistId } = request.params
     const { id: credentialId } = request.auth.credentials
-    console.log(playlistId, credentialId)
     await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId)
 
     const message = {
