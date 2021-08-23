@@ -3,7 +3,6 @@ const { Pool } = require('pg')
 const AuthorizationError = require('../../exceptions/AuthorizationError')
 const InvariantError = require('../../exceptions/InvariantError')
 const NotFoundError = require('../../exceptions/NotFoundError')
-const { mapDBtoModelPlaylistSongs } = require('../../utils/PlaylistUtils')
 
 class PlaylistsService {
   constructor (openMusicService, collaborationService, cacheService) {
@@ -116,25 +115,32 @@ class PlaylistsService {
     if (!result.rows[0].id) {
       throw new InvariantError('failed to add songs to the playlist')
     }
+    await this._cacheService.delete(`songInPlaylist:${playlistId}`)
   }
 
   async getSongsInPlaylist (id) {
-    const query = {
-      text: `SELECT playlistsongs.song_id, music.title, music.performer
-             FROM playlistsongs
-             INNER JOIN music ON playlistsongs.song_id = music.id
-             INNER JOIN playlists ON playlistsongs.playlist_id = playlists.id
-             WHERE playlists.id = $1`,
-      values: [id],
+    try {
+      const result = await this._cacheService.get(`songInPlaylist:${id}`)
+      return JSON.parse(result)
+    } catch (error) {
+      const query = {
+        text: `SELECT music.id, music.title, music.performer
+        FROM playlistsongs
+        INNER JOIN music ON playlistsongs.song_id = music.id
+        INNER JOIN playlists ON playlistsongs.playlist_id = playlists.id
+        WHERE playlists.id = $1`,
+        values: [id],
+      }
+
+      const result = await this._pool.query(query)
+
+      if (!result.rowCount) {
+        throw new NotFoundError('Your playlist is still empty, please add songs')
+      }
+      await this._cacheService.set(`songInPlaylist:${id}`, JSON.stringify(result.rows))
+      console.log(`Id : ${id}`)
+      return result.rows
     }
-
-    const result = await this._pool.query(query)
-
-    if (!result.rowCount) {
-      throw new NotFoundError('Your playlist is still empty, please add songs')
-    }
-
-    return result.rows.map(mapDBtoModelPlaylistSongs)
   }
 
   async delSongInplaylist ({ playlistId, songId }) {
@@ -150,6 +156,7 @@ class PlaylistsService {
         'Failed to delete song from playlist, id not found'
       )
     }
+    await this._cacheService.delete(`songInPlaylist:${playlistId}`)
   }
 
   async verifyPlaylistAccess (playlistId, userId) {

@@ -7,10 +7,10 @@ const routes = (handler) => [
     handler: handler.postUploadPictureHandler,
     options: {
       payload: {
-        maxBytes: 10000 * 5,
         allow: 'multipart/form-data',
         multipart: true,
         output: 'stream',
+        maxBytes: 500000,
       },
     },
   },
